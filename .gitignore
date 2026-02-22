@@ -1,0 +1,8 @@
+# Real secrets - never commit
+secrets/*.yaml
+!secrets/examples/
+
+# OS files
+.DS_Store
+*.swp
+*~

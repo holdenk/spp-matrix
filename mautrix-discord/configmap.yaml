@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mautrix-discord-config
+  namespace: matrix
+  labels:
+    app.kubernetes.io/name: mautrix-discord
+data:
+  config.yaml: |
+    homeserver:
+      address: http://tuwunel.matrix.svc.cluster.local:6167
+      domain: sparklingpinkpandas.com
+      software: standard
+
+    appservice:
+      address: http://mautrix-discord.matrix.svc.cluster.local:29334
+      hostname: 0.0.0.0
+      port: 29334
+      id: discord
+      bot:
+        username: discordbot
+        displayname: Discord Bridge Bot
+        avatar: mxc://mau.dev/NeXNQarUbrlYBiPCUI34sRIS
+
+      # Tokens are injected by the init container from secrets
+      as_token: __AS_TOKEN__
+      hs_token: __HS_TOKEN__
+
+    database:
+      type: postgres
+      uri: __DB_URI__
+
+    bridge:
+      username_template: "discord_{{.}}"
+      displayname_template: "{{.Username}}#{{.Discriminator}}"
+      channel_name_template: "#{{.Name}}"
+      guild_name_template: "{{.Name}}"
+      private_chat_portal_meta: always
+      startup_private_channel_create_limit: 5
+      delivery_receipts: false
+      message_status_events: false
+      restricted_rooms: false
+
+      # Permissions: who can use the bridge
+      permissions:
+        "sparklingpinkpandas.com": user
+        "@admin:sparklingpinkpandas.com": admin
+
+      encryption:
+        allow: false
+        default: false
+        require: false
+        # CRITICAL: must be false for Tuwunel compatibility
+        # See https://github.com/matrix-construct/tuwunel/issues/327
+        msc4190: false
+
+    logging:
+      min_level: info
+      writers:
+        - type: stdout
+          format: pretty-colored

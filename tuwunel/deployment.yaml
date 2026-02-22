@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tuwunel
+  namespace: matrix
+  labels:
+    app.kubernetes.io/name: tuwunel
+    app.kubernetes.io/component: homeserver
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # RocksDB requires exclusive access
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tuwunel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tuwunel
+        app.kubernetes.io/component: homeserver
+    spec:
+      # Pin to a node with reliable local storage
+      # Replace with your actual node hostname
+      nodeSelector:
+        kubernetes.io/hostname: "CHANGE_ME_NODE_HOSTNAME"
+      containers:
+        - name: tuwunel
+          image: ghcr.io/matrix-construct/tuwunel:v1.5.0
+          ports:
+            - containerPort: 6167
+              name: http
+          env:
+            - name: CONDUWUIT_SERVER_NAME
+              value: "sparklingpinkpandas.com"
+            - name: CONDUWUIT_DATABASE_PATH
+              value: "/data/db"
+            - name: CONDUWUIT_PORT
+              value: "6167"
+            - name: CONDUWUIT_ADDRESS
+              value: "0.0.0.0"
+            - name: CONDUWUIT_ALLOW_REGISTRATION
+              value: "true"
+            - name: CONDUWUIT_REGISTRATION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tuwunel-secrets
+                  key: registration-token
+            - name: CONDUWUIT_ALLOW_FEDERATION
+              value: "true"
+            - name: CONDUWUIT_MAX_REQUEST_SIZE
+              value: "52428800"  # 50 MB
+            # well-known delegation
+            - name: CONDUWUIT_WELL_KNOWN__CLIENT
+              value: "https://matrix.sparklingpinkpandas.com"
+            - name: CONDUWUIT_WELL_KNOWN__SERVER
+              value: "matrix.sparklingpinkpandas.com:443"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "2"
+              memory: "1Gi"
+          readinessProbe:
+            httpGet:
+              path: /_matrix/federation/v1/version
+              port: 6167
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /_matrix/federation/v1/version
+              port: 6167
+            initialDelaySeconds: 15
+            periodSeconds: 30
+
+        - name: backup
+          image: ghcr.io/CHANGE_ME_ORG/tuwunel-backup-sidecar:latest
+          env:
+            - name: DATA_DIR
+              value: "/data"
+            - name: BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: rclone-secrets
+                  key: bucket
+            - name: PREFIX
+              value: "tuwunel"
+            - name: BACKUP_INTERVAL
+              value: "21600"  # 6 hours
+            - name: RCLONE_CONF
+              value: "/config/rclone.conf"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: rclone-config
+              mountPath: /config
+              readOnly: true
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: tuwunel-data
+        - name: rclone-config
+          secret:
+            secretName: rclone-secrets
+            items:
+              - key: rclone.conf
+                path: rclone.conf

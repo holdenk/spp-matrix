@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: mautrix-discord-db
+  namespace: matrix
+  labels:
+    app.kubernetes.io/name: mautrix-discord
+    app.kubernetes.io/component: database
+spec:
+  instances: 1
+  storage:
+    size: 5Gi
+    storageClass: local-path
+  postgresql:
+    parameters:
+      shared_buffers: "64MB"
+      max_connections: "50"
+  bootstrap:
+    initdb:
+      database: mautrix_discord
+      owner: mautrix_discord
+      secret:
+        name: mautrix-discord-db-credentials

@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mautrix-discord
+  namespace: matrix
+  labels:
+    app.kubernetes.io/name: mautrix-discord
+    app.kubernetes.io/component: bridge
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mautrix-discord
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mautrix-discord
+        app.kubernetes.io/component: bridge
+    spec:
+      initContainers:
+        # Inject secrets into the config template
+        - name: config-inject
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - |
+              cp /config-template/config.yaml /data/config.yaml
+              sed -i "s|__DB_URI__|${DB_URI}|g" /data/config.yaml
+              sed -i "s|__AS_TOKEN__|${AS_TOKEN}|g" /data/config.yaml
+              sed -i "s|__HS_TOKEN__|${HS_TOKEN}|g" /data/config.yaml
+          env:
+            - name: DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mautrix-discord-secrets
+                  key: database-uri
+            - name: AS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mautrix-discord-secrets
+                  key: as-token
+            - name: HS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mautrix-discord-secrets
+                  key: hs-token
+          volumeMounts:
+            - name: config-template
+              mountPath: /config-template
+            - name: data
+              mountPath: /data
+      containers:
+        - name: mautrix-discord
+          image: dock.mau.dev/mautrix/discord:latest
+          ports:
+            - containerPort: 29334
+              name: appservice
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      volumes:
+        - name: config-template
+          configMap:
+            name: mautrix-discord-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: mautrix-discord-data
