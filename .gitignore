@@ -2,6 +2,10 @@
 secrets/*.yaml
 !secrets/examples/
 
+# Separate repos (nested but independently managed)
+matrix-site/
+spp-event-bot/
+
 # OS files
 .DS_Store
 *.swp
