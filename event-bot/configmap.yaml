@@ -6,8 +6,8 @@ metadata:
   labels:
     app.kubernetes.io/name: spp-event-bot
 data:
-  # XML event feed URL - configure when available
-  FEED_URL: "https://example.com/events.xml"
+  # iCal (.ics) event feed URL - configure when available
+  FEED_URL: "https://example.com/events.ics"
   # Poll interval in seconds (default: 15 minutes)
   POLL_INTERVAL: "900"
   # Matrix homeserver (in-cluster address)
