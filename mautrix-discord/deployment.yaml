@@ -28,9 +28,12 @@ spec:
             - -c
             - |
               cp /config-template/config.yaml /data/config.yaml
-              sed -i "s|__DB_URI__|${DB_URI}|g" /data/config.yaml
-              sed -i "s|__AS_TOKEN__|${AS_TOKEN}|g" /data/config.yaml
-              sed -i "s|__HS_TOKEN__|${HS_TOKEN}|g" /data/config.yaml
+              escaped_db=$(printf '%s\n' "$DB_URI" | sed 's/[&/\\|]/\\&/g')
+              escaped_as=$(printf '%s\n' "$AS_TOKEN" | sed 's/[&/\\|]/\\&/g')
+              escaped_hs=$(printf '%s\n' "$HS_TOKEN" | sed 's/[&/\\|]/\\&/g')
+              sed -i "s|__DB_URI__|${escaped_db}|g" /data/config.yaml
+              sed -i "s|__AS_TOKEN__|${escaped_as}|g" /data/config.yaml
+              sed -i "s|__HS_TOKEN__|${escaped_hs}|g" /data/config.yaml
           env:
             - name: DB_URI
               valueFrom:

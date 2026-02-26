@@ -223,6 +223,7 @@ Edit `event-bot/deployment.yaml`:
 - Set the container image to your built bot image
 
 ```bash
+kubectl apply -f event-bot/pvc.yaml
 kubectl apply -f event-bot/configmap.yaml
 kubectl apply -f event-bot/deployment.yaml
 ```

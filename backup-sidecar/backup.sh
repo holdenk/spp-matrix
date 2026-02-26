@@ -35,7 +35,7 @@ restore_from_s3() {
 
 run_backup() {
   log "Starting backup to ${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/"
-  if rclone sync "$DATA_DIR/" "${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/" \
+  if rclone copy "$DATA_DIR/" "${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/" \
     --config "$RCLONE_CONF" \
     --transfers 4 \
     --checkers 8 \

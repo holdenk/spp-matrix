@@ -6,7 +6,7 @@ Kubernetes manifests for deploying a [Tuwunel](https://github.com/matrix-constru
 
 - **Tuwunel** — Rust-based Matrix homeserver with backup sidecar
 - **mautrix-discord** — Discord bridge for Matrix
-- **SPP Event Bot** — Posts events from an XML feed to the #rides channel
+- **SPP Event Bot** — Posts events from an iCal feed to the #rides channel
 - **Backup Sidecar** — Automatic backup to Backblaze B2 with restore-on-empty
 
 ## Communities
@@ -88,7 +88,7 @@ kubectl exec deploy/mautrix-discord -n matrix -- cat /data/registration.yaml
 # Paste into Tuwunel admin room: !admin appservices register
 ```
 
-### 6. Deploy event bot (when XML feed is ready)
+### 6. Deploy event bot (when iCal feed is ready)
 
 ```bash
 kubectl apply -f secrets/event-bot-secrets.yaml
