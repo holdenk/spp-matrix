@@ -18,13 +18,16 @@ restore_from_s3() {
     log "Data directory is empty. Attempting restore from ${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/"
     if rclone ls "${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/" --config "$RCLONE_CONF" --max-depth 1 2>/dev/null | head -1 | grep -q .; then
       log "Backup found. Restoring..."
-      rclone sync "${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/" "$DATA_DIR/" \
+      if rclone sync "${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/" "$DATA_DIR/" \
         --config "$RCLONE_CONF" \
         --transfers 4 \
         --checkers 8 \
-        --log-level INFO
-      log "Restore complete. Files restored:"
-      ls -la "$DATA_DIR/"
+        --log-level INFO; then
+        log "Restore complete. Files restored:"
+        ls -la "$DATA_DIR/"
+      else
+        log "WARNING: Restore failed with exit code $?. Starting with empty data."
+      fi
     else
       log "No backup found in ${RCLONE_REMOTE}:${BUCKET}/${PREFIX}/. Starting fresh."
     fi
