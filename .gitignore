@@ -2,8 +2,7 @@
 secrets/*.yaml
 !secrets/examples/
 
-# Separate repos (nested but independently managed)
-matrix-site/
+# Separate repo (independently managed)
 spp-event-bot/
 
 # OS files

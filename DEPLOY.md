@@ -57,12 +57,35 @@ kubectl apply -f secrets/rclone-secrets.yaml
 
 ## Phase 2: Build and Push Backup Sidecar
 
+Using the deploy script:
+
+```bash
+./scripts/deploy.sh YOUR_ORG
+```
+
+Or manually:
+
 ```bash
 cd backup-sidecar
 docker build -t ghcr.io/YOUR_ORG/tuwunel-backup-sidecar:latest .
 docker push ghcr.io/YOUR_ORG/tuwunel-backup-sidecar:latest
 cd ..
 ```
+
+### Preflight Validation
+
+Before deploying, run the predeploy checks to catch common issues:
+
+```bash
+./scripts/predeploy-check.sh
+```
+
+This checks for:
+- **Errors**: Unresolved `CHANGE_ME_ORG` / `CHANGE_ME_NODE_HOSTNAME` placeholders in manifests
+- **Warnings**: Mutable `:latest` image tags
+- **YAML syntax**: Validates all manifest files (requires python3 + pyyaml)
+
+Fix any errors before proceeding. Warnings are informational (`:latest` is expected for locally-built images).
 
 ## Phase 3: Deploy Tuwunel
 

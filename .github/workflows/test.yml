@@ -30,10 +30,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run ShellCheck
+      - name: ShellCheck backup-sidecar
         uses: ludeeus/action-shellcheck@2.0.0
         with:
           scandir: ./backup-sidecar
+
+      - name: ShellCheck scripts
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: ./scripts
 
   hadolint:
     runs-on: ubuntu-latest

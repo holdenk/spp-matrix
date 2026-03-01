@@ -47,9 +47,7 @@ kubectl apply -f secrets/
 ### 2. Build and push the backup sidecar
 
 ```bash
-cd backup-sidecar
-docker build -t ghcr.io/YOUR_ORG/tuwunel-backup-sidecar:latest .
-docker push ghcr.io/YOUR_ORG/tuwunel-backup-sidecar:latest
+./scripts/deploy.sh YOUR_ORG
 ```
 
 ### 3. Deploy Tuwunel
@@ -95,6 +93,11 @@ kubectl apply -f secrets/event-bot-secrets.yaml
 kubectl apply -f event-bot/
 ```
 
+## Scripts
+
+- **`scripts/deploy.sh <org>`** — Build and push the backup sidecar image. Pass `--apply` to also run predeploy checks and `kubectl apply` core manifests.
+- **`scripts/predeploy-check.sh`** — Preflight validation: checks for unresolved placeholders, mutable `:latest` tags, and YAML syntax errors.
+
 ## Directory Structure
 
 ```
@@ -102,11 +105,12 @@ kubectl apply -f event-bot/
 ├── tuwunel/                 # Homeserver deployment manifests
 ├── mautrix-discord/         # Discord bridge manifests
 ├── event-bot/               # Event bot manifests
+├── matrix-site/             # Jekyll site for setup guides (GitHub Pages)
+├── scripts/                 # Deploy and validation scripts
 ├── secrets/examples/        # Secret templates (fill in and apply)
 └── namespace.yaml
 ```
 
 ## Related Repos
 
-- **matrix-site** — Jekyll site with setup guides (GitHub Pages)
 - **spp-event-bot** — Go bot source code
