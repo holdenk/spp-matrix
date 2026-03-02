@@ -19,10 +19,6 @@ spec:
         app.kubernetes.io/name: tuwunel
         app.kubernetes.io/component: homeserver
     spec:
-      # Pin to a node with reliable local storage
-      # Replace with your actual node hostname
-      nodeSelector:
-        kubernetes.io/hostname: "CHANGE_ME_NODE_HOSTNAME"
       containers:
         - name: tuwunel
           image: ghcr.io/matrix-construct/tuwunel:v1.5.0
@@ -30,40 +26,40 @@ spec:
             - containerPort: 6167
               name: http
           env:
-            - name: CONDUWUIT_SERVER_NAME
+            - name: TUWUNEL_SERVER_NAME
               value: "sparklingpinkpandas.com"
-            - name: CONDUWUIT_DATABASE_PATH
+            - name: TUWUNEL_DATABASE_PATH
               value: "/data/db"
-            - name: CONDUWUIT_PORT
+            - name: TUWUNEL_PORT
               value: "6167"
-            - name: CONDUWUIT_ADDRESS
+            - name: TUWUNEL_ADDRESS
               value: "0.0.0.0"
-            - name: CONDUWUIT_ALLOW_REGISTRATION
+            - name: TUWUNEL_ALLOW_REGISTRATION
               value: "true"
-            - name: CONDUWUIT_REGISTRATION_TOKEN
+            - name: TUWUNEL_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: tuwunel-secrets
                   key: registration-token
-            - name: CONDUWUIT_ALLOW_FEDERATION
+            - name: TUWUNEL_ALLOW_FEDERATION
               value: "true"
-            - name: CONDUWUIT_MAX_REQUEST_SIZE
+            - name: TUWUNEL_MAX_REQUEST_SIZE
               value: "52428800"  # 50 MB
             # well-known delegation
-            - name: CONDUWUIT_WELL_KNOWN__CLIENT
+            - name: TUWUNEL_WELL_KNOWN__CLIENT
               value: "https://matrix.sparklingpinkpandas.com"
-            - name: CONDUWUIT_WELL_KNOWN__SERVER
+            - name: TUWUNEL_WELL_KNOWN__SERVER
               value: "matrix.sparklingpinkpandas.com:443"
           volumeMounts:
             - name: data
               mountPath: /data
           resources:
             requests:
-              cpu: "250m"
-              memory: "256Mi"
+              cpu: "2"
+              memory: "4Gi"
             limits:
               cpu: "2"
-              memory: "1Gi"
+              memory: "4Gi"
           readinessProbe:
             httpGet:
               path: /_matrix/federation/v1/version
@@ -78,7 +74,7 @@ spec:
             periodSeconds: 30
 
         - name: backup
-          image: ghcr.io/CHANGE_ME_ORG/tuwunel-backup-sidecar:latest
+          image: holdenk/tuwunel-backup-sidecar:latest
           env:
             - name: DATA_DIR
               value: "/data"
