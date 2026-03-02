@@ -2,6 +2,9 @@
 secrets/*.yaml
 !secrets/examples/
 
+# Ansible vault (encrypted secrets)
+ansible/vault-vars.yml
+
 # Separate repo (independently managed)
 spp-event-bot/
 

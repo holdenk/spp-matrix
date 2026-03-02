@@ -1,0 +1,58 @@
+---
+# Ansible playbook to template and apply Matrix K8s secrets
+#
+# Usage:
+#   ansible-playbook playbook.yaml --ask-vault-pass
+#
+# This is an ALTERNATIVE to the manual kubectl workflow in DEPLOY.md.
+# It uses ansible-vault encrypted variables to populate K8s Secret manifests.
+
+- name: Apply Matrix K8s secrets
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vault-vars.yml
+
+  tasks:
+    - name: Ensure matrix namespace exists
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: matrix
+            labels:
+              app.kubernetes.io/part-of: matrix-homeserver
+
+    - name: Apply tuwunel-secrets
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'templates/tuwunel-secrets.yaml.j2') | from_yaml }}"
+
+    - name: Apply rclone-secrets
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'templates/rclone-secrets.yaml.j2') | from_yaml }}"
+
+    - name: Apply mautrix-discord-db-credentials
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'templates/mautrix-discord-db-credentials.yaml.j2') | from_yaml }}"
+
+    - name: Apply mautrix-discord-secrets
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'templates/mautrix-discord-secrets.yaml.j2') | from_yaml }}"
+
+    - name: Apply event-bot-secrets
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'templates/event-bot-secrets.yaml.j2') | from_yaml }}"
+
+    - name: Apply pg-backup secrets
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'templates/pg-backup-secrets.yaml.j2') | from_yaml }}"

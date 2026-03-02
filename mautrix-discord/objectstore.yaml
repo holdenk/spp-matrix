@@ -1,0 +1,26 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: mautrix-discord-db-backup
+  namespace: matrix
+  labels:
+    app.kubernetes.io/name: mautrix-discord
+    app.kubernetes.io/component: database-backup
+spec:
+  configuration:
+    destinationPath: s3://matrix-pg-backup-sparklingpinkpandas/
+    # Adjust region to match your B2 bucket
+    endpointURL: https://s3.us-west-004.backblazeb2.com
+    s3Credentials:
+      accessKeyId:
+        name: pg-backup
+        key: PG_ACCESS_KEY_ID
+      secretAccessKey:
+        name: pg-backup
+        key: PG_ACCESS_SECRET_KEY
+    wal:
+      compression: bzip2
+      maxParallel: 4
+    data:
+      compression: bzip2
+  retentionPolicy: "7d"

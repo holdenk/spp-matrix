@@ -55,6 +55,9 @@ kubectl apply -f secrets/tuwunel-secrets.yaml
 kubectl apply -f secrets/rclone-secrets.yaml
 ```
 
+> **Alternative:** Manage all secrets with Ansible Vault instead of manual copy-edit-apply.
+> See [`ansible/README.md`](ansible/README.md) for instructions.
+
 ## Phase 2: Build and Push Backup Sidecar
 
 Using the deploy script:
@@ -176,6 +179,28 @@ kubectl apply -f mautrix-discord/cnpg-cluster.yaml
 
 # Wait for the database to be ready
 kubectl get cluster -n matrix mautrix-discord-db -w
+```
+
+### 4.2.1 Configure PostgreSQL backups (recommended)
+
+```bash
+# Create pg-backup secret for CNPG backups to B2
+cp secrets/examples/pg-backup-secrets.example.yaml secrets/pg-backup-secrets.yaml
+# Edit: set B2 S3-compatible access key ID and secret access key
+
+kubectl apply -f secrets/pg-backup-secrets.yaml
+kubectl apply -f mautrix-discord/objectstore.yaml
+kubectl apply -f mautrix-discord/scheduled-backup.yaml
+```
+
+The CNPG cluster manifest already includes the Barman Cloud plugin configuration
+for WAL archiving. The ObjectStore defines the B2 destination and the ScheduledBackup
+triggers daily base backups at 2:00 AM UTC.
+
+Verify backup status:
+```bash
+kubectl get backup -n matrix
+kubectl get scheduledbackup -n matrix
 ```
 
 ### 4.3 Deploy bridge

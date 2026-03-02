@@ -101,9 +101,12 @@ kubectl apply -f event-bot/
 ## Directory Structure
 
 ```
+├── ansible/                 # Ansible Vault alternative for secrets management
 ├── backup-sidecar/          # Backup/restore sidecar container
 ├── tuwunel/                 # Homeserver deployment manifests
-├── mautrix-discord/         # Discord bridge manifests
+├── mautrix-discord/         # Discord bridge + CNPG database manifests
+│   ├── objectstore.yaml     #   Barman Cloud backup to B2
+│   └── scheduled-backup.yaml#   Daily base backup schedule
 ├── event-bot/               # Event bot manifests
 ├── matrix-site/             # Jekyll site for setup guides (GitHub Pages)
 ├── scripts/                 # Deploy and validation scripts

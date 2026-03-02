@@ -15,6 +15,12 @@ spec:
     parameters:
       shared_buffers: "64MB"
       max_connections: "50"
+  # Enable WAL archiving via Barman Cloud plugin
+  plugins:
+  - name: barman-cloud.cloudnative-pg.io
+    isWALArchiver: true
+    parameters:
+      barmanObjectName: mautrix-discord-db-backup
   bootstrap:
     initdb:
       database: mautrix_discord

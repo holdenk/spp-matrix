@@ -1,0 +1,37 @@
+---
+# Ansible Vault Variables for Matrix K8s Secrets
+#
+# Copy this file to vault-vars.yml, fill in all values,
+# then encrypt: ansible-vault encrypt vault-vars.yml
+#
+# After encryption the file will look like:
+#   $ANSIBLE_VAULT;1.1;AES256
+#   62313365396662343061393464336163383764316462
+#   3661626231633033303861343333643038313339613562
+#   ...
+
+# --- Tuwunel homeserver ---
+# Generate with: openssl rand -hex 32
+tuwunel_registration_token: "CHANGE_ME"
+
+# --- Backblaze B2 (Tuwunel RocksDB backup via rclone) ---
+b2_key_id: "CHANGE_ME"
+b2_app_key: "CHANGE_ME"
+b2_bucket: "matrix-backup-sparklingpinkpandas"
+
+# --- mautrix-discord PostgreSQL ---
+# Generate with: openssl rand -hex 32
+mautrix_discord_db_password: "CHANGE_ME"
+
+# --- mautrix-discord bridge ---
+# Generate both with: openssl rand -hex 32
+mautrix_discord_as_token: "CHANGE_ME"
+mautrix_discord_hs_token: "CHANGE_ME"
+
+# --- Event bot ---
+# Obtain after creating bot user and logging in (see DEPLOY.md Phase 5)
+event_bot_access_token: "CHANGE_ME"
+
+# --- PostgreSQL backup (CNPG Barman Cloud to B2) ---
+pg_backup_access_key_id: "CHANGE_ME"
+pg_backup_secret_access_key: "CHANGE_ME"
