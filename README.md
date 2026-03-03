@@ -56,7 +56,9 @@ Edit `tuwunel/deployment.yaml` — set `nodeSelector` hostname and backup sideca
 
 ```bash
 kubectl apply -f tuwunel/
-kubectl apply -f matrix-site/
+kubectl apply -f matrix-site/configmap.yaml
+kubectl apply -f matrix-site/deployment.yaml
+kubectl apply -f matrix-site/service.yaml
 ```
 
 Verify:
