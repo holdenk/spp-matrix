@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-DATA_DIR="${DATA_DIR:-/data}"
+DATA_DIR="${DATA_DIR:-/data/backup}"
 BACKUP_INTERVAL="${BACKUP_INTERVAL:-21600}"  # 6 hours default
 RCLONE_REMOTE="${RCLONE_REMOTE:-b2}"
 BUCKET="${BUCKET:?BUCKET env var is required}"
