@@ -110,6 +110,9 @@ Open `tuwunel/deployment.yaml` and update:
 kubectl apply -f tuwunel/pvc.yaml
 kubectl apply -f tuwunel/service.yaml
 kubectl apply -f tuwunel/deployment.yaml
+kubectl apply -f matrix-site/configmap.yaml
+kubectl apply -f matrix-site/deployment.yaml
+kubectl apply -f matrix-site/service.yaml
 kubectl apply -f tuwunel/ingress-matrix.yaml
 kubectl apply -f tuwunel/ingress-dinner.yaml
 ```
@@ -132,6 +135,9 @@ kubectl get certificate -n matrix
 # Test federation endpoint (may take a minute for cert to issue)
 curl https://matrix.sparklingpinkpandas.com/_matrix/federation/v1/version
 
+# Root should serve the onboarding site
+curl https://matrix.sparklingpinkpandas.com/
+
 # Test well-known delegation
 curl https://matrix.sparklingpinkpandas.com/.well-known/matrix/client
 curl https://dinner.sparklingpinkpandas.com/.well-known/matrix/server
@@ -139,9 +145,9 @@ curl https://dinner.sparklingpinkpandas.com/.well-known/matrix/server
 
 ### 3.4 Create admin account and configure backup token
 
-Open Element (app.element.io or desktop) and register:
-1. Set homeserver to `matrix.sparklingpinkpandas.com`
-2. Create account using the registration token you generated
+Open Cinny Web (`https://app.cinny.in/#/register`) and register:
+1. Choose **Custom homeserver** and set it to `matrix.sparklingpinkpandas.com`
+2. Create account using the invite code/registration token you generated
 3. This first account becomes your admin
 
 Then obtain an access token for the backup sidecar:
@@ -168,7 +174,7 @@ The backup sidecar will not run backups until this token is set.
 
 ### 3.5 Create Spaces and rooms
 
-In Element as admin:
+In your Matrix client as admin:
 1. Create Space: **Sparkling Pink Pandas**
    - Add rooms: `#general`, `#rides`, `#random`
 2. Create Space: **Degenderates Dinner Club**
@@ -345,12 +351,13 @@ Restore is a manual process:
 
 ## Inviting Users
 
-Share the registration token with people you want to invite, along with a link to the setup guide website. They will:
-1. Visit the website for their platform's setup guide
-2. Download Element
-3. Set homeserver to `matrix.sparklingpinkpandas.com`
-4. Create an account using the registration token
-5. Join the appropriate Space
+Share the invite code with people you want to invite, along with a link to the setup guide website. They should:
+1. Open the web client ([Cinny Web](https://app.cinny.in/#/register))
+2. Choose **Custom homeserver** and set homeserver to `matrix.sparklingpinkpandas.com`
+3. Sign up using the invite code
+4. If they do not have an invite code, email `info@sparklingpinkpandas.com` or ask someone already on the server if they know someone who can vouch for them
+5. After account setup works in the web client, download their preferred phone client and sign in
+6. Join the appropriate Space
 
 ## Troubleshooting
 

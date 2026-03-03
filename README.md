@@ -56,6 +56,9 @@ Edit `tuwunel/deployment.yaml` — set `nodeSelector` hostname and backup sideca
 
 ```bash
 kubectl apply -f tuwunel/
+kubectl apply -f matrix-site/configmap.yaml
+kubectl apply -f matrix-site/deployment.yaml
+kubectl apply -f matrix-site/service.yaml
 ```
 
 Verify:
@@ -65,7 +68,7 @@ curl https://matrix.sparklingpinkpandas.com/_matrix/federation/v1/version
 
 ### 4. Create admin account
 
-The first user registers with the registration token via Element. Then create Spaces and rooms via the admin room (`#admins:sparklingpinkpandas.com`).
+The first user registers using the invite code in Cinny Web (`https://app.cinny.in/#/register`) against `matrix.sparklingpinkpandas.com`. If someone needs an invite code, direct them to email `info@sparklingpinkpandas.com` or ask someone already on the server for an introduction. After account setup, they can use their preferred phone client. Then create Spaces and rooms via the admin room (`#admins:sparklingpinkpandas.com`).
 
 ### 5. Deploy Discord bridge (when ready)
 
@@ -108,7 +111,7 @@ kubectl apply -f event-bot/
 │   ├── objectstore.yaml     #   Barman Cloud backup to B2
 │   └── scheduled-backup.yaml # Daily base backup schedule
 ├── event-bot/               # Event bot manifests
-├── matrix-site/             # Jekyll site for setup guides (GitHub Pages)
+├── matrix-site/             # Signup site content + Kubernetes manifests
 ├── scripts/                 # Deploy and validation scripts
 ├── secrets/examples/        # Secret templates (fill in and apply)
 └── namespace.yaml

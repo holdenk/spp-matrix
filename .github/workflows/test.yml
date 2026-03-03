@@ -19,7 +19,12 @@ jobs:
 
       - name: Validate Kubernetes manifests
         run: |
-          find . -name '*.yaml' -not -path './.github/*' -not -path './secrets/*' -not -path './backup-sidecar/*' | \
+          find . -name '*.yaml' \
+            -not -path './.github/*' \
+            -not -path './secrets/*' \
+            -not -path './backup-sidecar/*' \
+            -not -path './ansible/*' \
+            -not -path './matrix-site/_config.yml' | \
             xargs kubeconform \
               -strict \
               -ignore-missing-schemas \
@@ -49,3 +54,19 @@ jobs:
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: backup-sidecar/Dockerfile
+
+  website-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: matrix-site
+
+      - name: Build website
+        run: bundle exec jekyll build
+        working-directory: matrix-site
