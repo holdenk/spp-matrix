@@ -1,0 +1,9 @@
+title: Sparkling Pink Pandas Matrix
+email: info@sparklingpinkpandas.com
+description: Friendly setup guides for joining the Sparkling Pink Pandas Matrix community.
+baseurl: ""
+url: ""
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed

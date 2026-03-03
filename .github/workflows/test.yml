@@ -49,3 +49,18 @@ jobs:
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: backup-sidecar/Dockerfile
+
+  website-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: matrix-site
+
+      - name: Build website
+        run: bundle exec jekyll build
+        working-directory: matrix-site
