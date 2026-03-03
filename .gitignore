@@ -1,5 +1,7 @@
 # Real secrets - never commit
 secrets/*.yaml
+secrets/*.yaml~
+secrets/deployed/
 !secrets/examples/
 
 # Ansible vault (encrypted secrets)
