@@ -17,7 +17,7 @@ warn() {
     WARNINGS=$((WARNINGS + 1))
 }
 
-MANIFEST_DIRS=("tuwunel" "mautrix-discord" "event-bot")
+MANIFEST_DIRS=("tuwunel" "mautrix-discord" "event-bot" "matrix-site")
 MANIFEST_FILES=("namespace.yaml")
 
 # --- Check for unresolved placeholders ---
