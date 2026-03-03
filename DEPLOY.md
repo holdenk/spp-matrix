@@ -42,9 +42,10 @@ kubectl apply -f namespace.yaml
 Copy each example and fill in real values:
 
 ```bash
-# Tuwunel registration token
+# Tuwunel registration token + backup admin token
 cp secrets/examples/tuwunel-secrets.example.yaml secrets/tuwunel-secrets.yaml
 # Edit: set registration-token to output of `openssl rand -hex 32`
+# Note: admin-token is populated later in Phase 3.4 (after creating admin user)
 
 # Backblaze B2 credentials for backup sidecar
 cp secrets/examples/rclone-secrets.example.yaml secrets/rclone-secrets.yaml
@@ -136,12 +137,34 @@ curl https://matrix.sparklingpinkpandas.com/.well-known/matrix/client
 curl https://dinner.sparklingpinkpandas.com/.well-known/matrix/server
 ```
 
-### 3.4 Create admin account
+### 3.4 Create admin account and configure backup token
 
 Open Element (app.element.io or desktop) and register:
 1. Set homeserver to `matrix.sparklingpinkpandas.com`
 2. Create account using the registration token you generated
 3. This first account becomes your admin
+
+Then obtain an access token for the backup sidecar:
+
+```bash
+# Log in as the admin user to get an access token
+curl -s -X POST https://matrix.sparklingpinkpandas.com/_matrix/client/v3/login \
+  -H 'Content-Type: application/json' \
+  -d '{"type":"m.login.password","identifier":{"type":"m.id.user","user":"YOUR_ADMIN_USERNAME"},"password":"YOUR_PASSWORD"}'
+# Copy the "access_token" from the response
+```
+
+Update the tuwunel-secrets with the admin token:
+
+```bash
+# Edit secrets/tuwunel-secrets.yaml and set admin-token to the access_token value
+kubectl apply -f secrets/tuwunel-secrets.yaml
+
+# Restart the pod to pick up the new secret
+kubectl rollout restart deploy/tuwunel -n matrix
+```
+
+The backup sidecar will not run backups until this token is set.
 
 ### 3.5 Create Spaces and rooms
 
@@ -286,23 +309,39 @@ You should see periodic feed polls and event posts.
 
 ## Backup Verification
 
-### Manual backup test
+### How backups work
+
+The backup sidecar runs alongside tuwunel in the same pod. Every 6 hours it:
+1. Calls the tuwunel admin API to trigger `!admin server backup_database`
+2. Waits for the consistent RocksDB snapshot to be written to `/data/backup/`
+3. Uploads the RocksDB snapshot to B2 at `{bucket}/tuwunel/backup/`
+4. Uploads media files from `/data/db/media/` to B2 at `{bucket}/tuwunel/media/`
+
+Backups will not run until the `admin-token` is set in `tuwunel-secrets` (see Phase 3.4).
+
+### Check backup status
 
 ```bash
 # Check sidecar logs for backup status
 kubectl logs -n matrix -l app.kubernetes.io/name=tuwunel -c backup
 
 # Verify data exists in B2 (requires rclone locally)
-rclone ls b2:matrix-backup-sparklingpinkpandas/tuwunel/ --config your-rclone.conf
+rclone ls b2:matrix-backup-sparklingpinkpandas/tuwunel/backup/ --config your-rclone.conf
+rclone ls b2:matrix-backup-sparklingpinkpandas/tuwunel/media/ --config your-rclone.conf
 ```
 
-### Restore test
+### Manual restore
 
-To verify restore works:
+Restore is a manual process:
+
 1. Scale down: `kubectl scale deploy tuwunel -n matrix --replicas=0`
-2. Delete the PVC data (or create a fresh PVC)
-3. Scale up: `kubectl scale deploy tuwunel -n matrix --replicas=1`
-4. Watch the sidecar logs — it should detect the empty directory and restore from B2
+2. Copy backup data from B2 to the PVC (e.g., via a debug pod or local rclone):
+   ```bash
+   rclone copy b2:matrix-backup-sparklingpinkpandas/tuwunel/backup/ /path/to/pvc/backup/ --config your-rclone.conf
+   rclone copy b2:matrix-backup-sparklingpinkpandas/tuwunel/media/ /path/to/pvc/db/media/ --config your-rclone.conf
+   ```
+3. Follow the [tuwunel restore procedure](https://github.com/matrix-construct/tuwunel/blob/main/docs/maintenance.md) to reconstruct the database from the backup files
+4. Scale up: `kubectl scale deploy tuwunel -n matrix --replicas=1`
 
 ## Inviting Users
 
@@ -321,4 +360,4 @@ Share the registration token with people you want to invite, along with a link t
 | TLS cert not issuing | Check `kubectl describe certificate -n matrix` and cert-manager logs |
 | Can't register | Verify the registration token secret is correct and Tuwunel picked it up |
 | Bridge not connecting | Check bridge logs, verify appservice is registered, check network policies |
-| Backup failing | Check sidecar logs, verify B2 credentials in the rclone secret |
+| Backup failing | Check sidecar logs, verify B2 credentials in the rclone secret and admin-token in tuwunel-secrets |

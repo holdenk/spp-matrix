@@ -78,8 +78,6 @@ spec:
         - name: backup
           image: holdenk/tuwunel-backup-sidecar:latest
           env:
-            - name: DATA_DIR
-              value: "/data"
             - name: BUCKET
               valueFrom:
                 secretKeyRef:
@@ -91,6 +89,15 @@ spec:
               value: "21600"  # 6 hours
             - name: RCLONE_CONF
               value: "/config/rclone.conf"
+            - name: TUWUNEL_URL
+              value: "http://localhost:6167"
+            - name: SERVER_NAME
+              value: "sparklingpinkpandas.com"
+            - name: ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tuwunel-secrets
+                  key: admin-token
           volumeMounts:
             - name: data
               mountPath: /data

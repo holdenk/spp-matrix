@@ -14,6 +14,9 @@
 # Generate with: openssl rand -hex 32
 tuwunel_registration_token: "CHANGE_ME"
 
+# Admin user access token for backup sidecar (obtain after creating admin user)
+tuwunel_admin_token: "CHANGE_ME"
+
 # --- Backblaze B2 (Tuwunel RocksDB backup via rclone) ---
 b2_key_id: "CHANGE_ME"
 b2_app_key: "CHANGE_ME"
