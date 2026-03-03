@@ -68,6 +68,7 @@ if [[ "$APPLY" == true ]]; then
     echo "==> Applying core manifests"
     kubectl apply -f "$REPO_ROOT/namespace.yaml"
     kubectl apply -f "$REPO_ROOT/tuwunel/"
+    kubectl apply -f "$REPO_ROOT/matrix-site/"
     kubectl apply -f "$REPO_ROOT/event-bot/"
 
     echo ""

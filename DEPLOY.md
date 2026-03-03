@@ -106,6 +106,12 @@ Open `tuwunel/deployment.yaml` and update:
 
 ### 3.2 Apply manifests
 
+If you've edited `matrix-site/index.html`, regenerate the ConfigMap first:
+
+```bash
+make site-configmap
+```
+
 ```bash
 kubectl apply -f tuwunel/pvc.yaml
 kubectl apply -f tuwunel/service.yaml

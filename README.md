@@ -100,6 +100,14 @@ kubectl apply -f event-bot/
 
 - **`scripts/deploy.sh <org>`** — Build and push the backup sidecar image. Pass `--apply` to also run predeploy checks and `kubectl apply` core manifests.
 - **`scripts/predeploy-check.sh`** — Preflight validation: checks for unresolved placeholders, mutable `:latest` tags, and YAML syntax errors.
+- **`scripts/generate-site-configmap.sh`** — Regenerates `matrix-site/configmap.yaml` from `matrix-site/index.html`. Run this (or `make site-configmap`) after editing the HTML.
+
+## Makefile Targets
+
+| Target | Description |
+|--------|-------------|
+| `make site-configmap` | Regenerate `matrix-site/configmap.yaml` from `matrix-site/index.html` |
+| `make predeploy-check` | Run preflight validation checks |
 
 ## Directory Structure
 
