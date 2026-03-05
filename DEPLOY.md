@@ -102,7 +102,7 @@ Open `tuwunel/deployment.yaml` and update:
    kubectl get nodes -o wide  # pick a node
    ```
 
-2. **Backup sidecar image** — replace `ghcr.io/CHANGE_ME_ORG/tuwunel-backup-sidecar:latest` with your actual image
+2. **Backup sidecar image** — verify the backup sidecar image matches your registry (currently `holdenk/tuwunel-backup-sidecar:latest`)
 
 ### 3.2 Apply manifests
 

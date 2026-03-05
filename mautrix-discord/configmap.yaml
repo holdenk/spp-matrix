@@ -32,7 +32,7 @@ data:
 
     bridge:
       username_template: "discord_{{.}}"
-      displayname_template: "{{.Username}}#{{.Discriminator}}"
+      displayname_template: "{{.Username}} (Discord)"
       channel_name_template: "#{{.Name}}"
       guild_name_template: "{{.Name}}"
       private_chat_portal_meta: always

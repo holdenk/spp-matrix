@@ -31,8 +31,8 @@ for dir in "${MANIFEST_DIRS[@]}"; do
     while IFS= read -r file; do
         while IFS= read -r match; do
             error "$file: unresolved placeholder: $match"
-        done < <(grep -n 'CHANGE_ME_ORG\|CHANGE_ME_NODE_HOSTNAME' "$file" || true)
-    done < <(find "$target" -name '*.yaml' -type f)
+        done < <(grep -n 'CHANGE_ME_ORG\|CHANGE_ME_NODE_HOSTNAME\|CHANGE_ME' "$file" || true)
+    done < <(find "$target" -name '*.yaml' -type f -not -path '*/examples/*')
 done
 
 for file in "${MANIFEST_FILES[@]}"; do
@@ -42,7 +42,7 @@ for file in "${MANIFEST_FILES[@]}"; do
     fi
     while IFS= read -r match; do
         error "$target: unresolved placeholder: $match"
-    done < <(grep -n 'CHANGE_ME_ORG\|CHANGE_ME_NODE_HOSTNAME' "$target" || true)
+    done < <(grep -n 'CHANGE_ME_ORG\|CHANGE_ME_NODE_HOSTNAME\|CHANGE_ME' "$target" || true)
 done
 
 # --- Check for mutable :latest tags ---

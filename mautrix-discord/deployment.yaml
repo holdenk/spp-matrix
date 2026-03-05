@@ -61,6 +61,16 @@ spec:
           ports:
             - containerPort: 29334
               name: appservice
+          readinessProbe:
+            tcpSocket:
+              port: appservice
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          livenessProbe:
+            tcpSocket:
+              port: appservice
+            initialDelaySeconds: 30
+            periodSeconds: 60
           volumeMounts:
             - name: data
               mountPath: /data
